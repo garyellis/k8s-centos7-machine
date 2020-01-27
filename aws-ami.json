@@ -1,0 +1,55 @@
+{
+  "variables": {
+    "ami_name": "{{env `NAME`}}",
+    "ami_description": "{{env `DESC`}}",
+    "ami_regions": "{{env `PACKER_AWS_EBS_AMI_REGIONS`}}",
+    "ami_users": "{{env `PACKER_AWS_EBS_AMI_USERS`}}",
+    "source_ami": "{{env `PACKER_AWS_EBS_SOURCE_AMI`}}",
+    "vpc_id": "{{env `PACKER_AWS_EBS_VPC_ID`}}",
+    "subnet_id": "{{env `PACKER_AWS_EBS_SUBNET_ID`}}",
+    "security_group_ids": "{{env `PACKER_AWS_EBS_SECURITY_GROUP_IDS`}}",
+    "instance_type": "{{env `PACKER_AWS_EBS_INSTANCE_TYPE`}}",
+    "ssh_username": "{{env `PACKER_SSH_USERNAME`}}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_name": "{{user `ami_name`}}",
+      "ami_description": "{{user `ami_description`}}",
+      "tags": {},
+      "ami_regions": "{{user `ami_regions`}}",
+      "ami_users": "{{user `ami_users`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}",
+      "associate_public_ip_address": "false",
+      "instance_type": "{{user `instance_type`}}",
+      "encrypt_boot": "false",
+      "ena_support": true,
+      "sriov_support": "false",
+      "run_volume_tags": {},
+      "ssh_username": "centos"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "remote_folder": "/home/centos",
+      "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'",
+      "script": "files/prep.sh"
+    },
+    {
+      "type": "ansible",
+      "user": "{{user `ssh_username`}}",
+      "playbook_file": "ansible/playbook.yaml",
+      "extra_arguments": ["-v", "-b"]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "manifest",
+      "output": "manifest-aws-ami.json",
+      "strip_path": true
+    }
+  ]
+}

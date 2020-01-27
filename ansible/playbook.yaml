@@ -1,0 +1,11 @@
+---
+- name: install docker
+  hosts: all
+  tasks:
+  - name: upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+  roles:
+    - ansible-role-docker
+    - k8s-bin

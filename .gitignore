@@ -1,0 +1,6 @@
+manifest-aws-ami.json
+manifest-vsphere-iso.json
+**.terraform
+**terraform.tfstate
+**terraform.tfstate.backup
+*.pyc
